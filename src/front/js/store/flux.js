@@ -29,7 +29,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ message: data.message })
 					// don't forget to return something, that is how the async resolves
 					return data;
-				}catch(error){
+				} catch (error) {
 					console.log("Error loading message from backend", error)
 				}
 			},
@@ -47,8 +47,47 @@ const getState = ({ getStore, getActions, setStore }) => {
 				//reset the global store
 				setStore({ demo: demo });
 			}
+			},
+			register: async (InputEmail, InputPassword) => {
+				try {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/registrar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({email: InputEmail, password: InputPassword })
+                    });
+                    if (!response.ok) {
+                        throw new Error("Error en el registro del usuario");
+                    }
+                    const data = await response.json();
+                    console.log("Usuario registrado:", data);
+                    
+                } catch (error) {
+                    console.error("Ha habido un error:", error.message);
+                }
+			},
+			login: async (InputEmail, InputPassword) => {
+				try {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({email: InputEmail, password: InputPassword })
+                    });
+                    if (!response.ok) {
+						throw new Error("Error al iniciar sesión");
+                    }
+                    const data = await response.json();
+                    console.log("Usuario autenticado:", data);
+                    sessionStorage.setItem("token", data.token);
+                    
+                } catch (error) {
+                    console.error("Error de autenticación:", error.message);
+                }
+			},
 		}
 	};
-};
 
 export default getState;
